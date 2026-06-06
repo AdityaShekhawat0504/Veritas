@@ -1,0 +1,17 @@
+cat > .gitignore << 'EOF'
+# secrets
+.env
+.env.local
+.env*.local
+
+# dependencies
+node_modules/
+
+# next.js build output
+.next/
+out/
+
+# misc
+.DS_Store
+*.log
+EOFCLAUDE.md # or SPEC.md, whatever you name it
