@@ -1,5 +1,4 @@
-cat > .gitignore << 'EOF'
-# secrets
+# secrets / env
 .env
 .env.local
 .env*.local
@@ -10,8 +9,12 @@ node_modules/
 # next.js build output
 .next/
 out/
+next-env.d.ts
+
+# prisma / sqlite
+/prisma/*.db
+/prisma/*.db-journal
 
 # misc
 .DS_Store
 *.log
-EOFCLAUDE.md # or SPEC.md, whatever you name it

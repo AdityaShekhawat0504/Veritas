@@ -1,0 +1,66 @@
+// Veritas IC — data model. Implements the spec schema exactly.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Thesis {
+  id             String   @id @default(cuid())
+  actor          String
+  claim          String
+  direction      String // "long" | "short" | "hold"
+  horizon        String // e.g. "12 months"
+  conviction     String // "low" | "medium" | "high"
+  integrityScore Int      @default(100)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  assumptions Assumption[]
+  decision    Decision?
+  checks      Check[]
+}
+
+model Assumption {
+  id          String    @id @default(cuid())
+  thesisId    String
+  text        String
+  criticality String // "critical" | "supporting"
+  status      String // "holding" | "weakening" | "contradicted"
+  reason      String?
+  source      String?
+  lastChecked DateTime?
+
+  evidence Evidence[]
+  thesis   Thesis     @relation(fields: [thesisId], references: [id], onDelete: Cascade)
+}
+
+model Evidence {
+  id           String  @id @default(cuid())
+  assumptionId String
+  text         String
+  source       String?
+
+  assumption Assumption @relation(fields: [assumptionId], references: [id], onDelete: Cascade)
+}
+
+model Decision {
+  id       String  @id @default(cuid())
+  thesisId String  @unique
+  action   String // "buy" | "sell" | "size up" | "hold" | etc.
+  sizing   String?
+
+  thesis Thesis @relation(fields: [thesisId], references: [id], onDelete: Cascade)
+}
+
+model Check {
+  id        String   @id @default(cuid())
+  thesisId  String
+  score     Int
+  createdAt DateTime @default(now())
+
+  thesis Thesis @relation(fields: [thesisId], references: [id], onDelete: Cascade)
+}

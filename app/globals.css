@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* ---- Design tokens: a calm, product-grade dark fintech palette ---- */
+@theme {
+  --color-canvas: #0a0c10;
+  --color-surface: #12151c;
+  --color-surface-2: #181c25;
+  --color-border: #232834;
+  --color-border-strong: #2f3543;
+
+  --color-ink: #e9edf4;
+  --color-ink-muted: #9aa4b6;
+  --color-ink-faint: #5f6979;
+
+  --color-accent: #5b8cff;
+  --color-accent-soft: #1a2541;
+
+  --color-holding: #34d399;
+  --color-weakening: #fbbf24;
+  --color-contradicted: #f87171;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+html,
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* thin, unobtrusive scrollbars to match the dark surface */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
