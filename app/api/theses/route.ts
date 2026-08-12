@@ -2,6 +2,7 @@
 // All DB access goes through lib/db.ts; this route never touches Prisma.
 
 import { NextResponse } from "next/server";
+import { requireUserId } from "@/lib/auth";
 import { createThesis } from "@/lib/db";
 import type {
   DecomposedThesis,
@@ -40,6 +41,11 @@ function validate(body: unknown): (DecomposedThesis & { actor: string }) | null 
 }
 
 export async function POST(req: Request) {
+  const userId = await requireUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -56,7 +62,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const id = await createThesis(input);
+    const id = await createThesis(input, userId);
     return NextResponse.json({ id });
   } catch (err) {
     console.error("[/api/theses] failed:", err);

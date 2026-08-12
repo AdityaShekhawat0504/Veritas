@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { requireUserId } from "@/lib/auth";
 import { getThesisById } from "@/lib/db";
 import type { Assumption } from "@/lib/types";
 import { ScoreDial } from "@/components/ScoreDial";
@@ -75,7 +76,9 @@ export default async function ThesisDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const thesis = await getThesisById(id);
+  const userId = await requireUserId();
+  if (!userId) redirect("/signin");
+  const thesis = await getThesisById(id, userId);
   if (!thesis) notFound();
 
   const history = thesis.checks.map((c) => c.score);
@@ -131,7 +134,7 @@ export default async function ThesisDetailPage({
             <Sparkline points={history} width={216} />
           </div>
           <div className="w-full">
-            <CheckButton />
+            <CheckButton thesisId={thesis.id} />
           </div>
         </div>
       </div>
