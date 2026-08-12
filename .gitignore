@@ -21,3 +21,6 @@ CLAUDE.md
 # misc
 .DS_Store
 *.log
+.vercel
+.env*
+!.env.example
