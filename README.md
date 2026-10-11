@@ -1,4 +1,6 @@
-# Veritas IC
+# Veritas
+
+Live: https://veritas-rose-beta.vercel.app
 
 Turn an investment memo into a structured, monitorable **thesis**.
 
@@ -112,7 +114,7 @@ the Prisma CLI). Google OAuth needs the redirect URI
 `https://YOUR-DOMAIN/api/auth/callback/google` in production.
 
 Optional: `npx prisma db seed` creates a local `demo@veritas.local` user with
-the sample theses, so the app is explorable without signing in. Real users are
+the sample theses, for local development. Real users are
 never auto-seeded — they opt in via *Load samples*.
 
 ## Scripts
@@ -128,7 +130,8 @@ never auto-seeded — they opt in via *Load samples*.
 
 ## Deploy
 
-Deployed on Vercel. Set the five secrets above as Vercel environment variables,
+Deployed on Vercel. Set the env vars above as Vercel environment variables, plus
+`AUTH_URL` set to your production domain,
 add the production callback URL to the Google OAuth client, and push — the build
 command runs `prisma migrate deploy` before `next build`, so migrations apply on
 deploy. Schema changes go through `prisma migrate`, never `db push`.
