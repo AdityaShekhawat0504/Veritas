@@ -1,0 +1,32 @@
+{
+ "_note": "SYNTHETIC test fixture in the documented response shape. Not recorded from the live API; values are made up.",
+ "cik": 1,
+ "taxonomy": "us-gaap",
+ "tag": "Revenues",
+ "label": "Revenues",
+ "entityName": "EXAMPLE CORP (fixture)",
+ "units": {
+  "USD": [
+   {
+    "end": "2017-06-30",
+    "val": 500,
+    "accn": "0000000001-17-000020",
+    "form": "10-Q",
+    "filed": "2017-08-02",
+    "fy": 2017,
+    "fp": "Q2",
+    "start": "2017-04-01"
+   },
+   {
+    "end": "2018-06-30",
+    "val": 520,
+    "accn": "0000000001-18-000020",
+    "form": "10-Q",
+    "filed": "2018-08-02",
+    "fy": 2018,
+    "fp": "Q2",
+    "start": "2018-04-01"
+   }
+  ]
+ }
+}

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getDb } from "@/db/client";
 import { currentActor, getThesisDetail } from "@/lib/queries";
 import { CriticalTag, DirectionBadge, VerdictChip } from "@/components/badges";
+import { RunChecksButton } from "@/components/RunChecksButton";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,11 @@ export default async function ThesisPage({ params }: { params: Promise<{ id: str
           <Link href={`/thesis/${t.id}/review`} className="mt-3 inline-block text-sm text-accent hover:underline">
             This thesis is a draft. Review and confirm it →
           </Link>
+        )}
+        {t.status === "open" && (
+          <div className="mt-4">
+            <RunChecksButton thesisId={t.id} />
+          </div>
         )}
       </div>
 

@@ -1,0 +1,42 @@
+{
+ "_note": "SYNTHETIC test fixture in the documented response shape. Not recorded from the live API; values are made up.",
+ "cik": "0000000001",
+ "name": "EXAMPLE CORP (fixture)",
+ "tickers": [
+  "EXMP"
+ ],
+ "filings": {
+  "recent": {
+   "accessionNumber": [
+    "0000000001-25-000012",
+    "0000000001-25-000011",
+    "0000000001-25-000010",
+    "0000000001-24-000020"
+   ],
+   "filingDate": [
+    "2025-08-01",
+    "2025-07-15",
+    "2025-05-02",
+    "2024-08-02"
+   ],
+   "reportDate": [
+    "2025-06-30",
+    "2025-07-14",
+    "2025-03-31",
+    "2024-06-30"
+   ],
+   "form": [
+    "10-Q",
+    "8-K",
+    "10-Q",
+    "10-Q"
+   ],
+   "primaryDocument": [
+    "exmp-20250630.htm",
+    "exmp-8k-20250715.htm",
+    "exmp-20250331.htm",
+    "exmp-20240630.htm"
+   ]
+  }
+ }
+}

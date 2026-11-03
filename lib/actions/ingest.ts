@@ -12,6 +12,9 @@ import { parseInput } from "./context";
 import { ActionError } from "./errors";
 import { writeLog } from "./log";
 
+/** Accepts a Date or an ISO date string. */
+const dateInput = z.preprocess((v) => (typeof v === "string" ? new Date(v) : v), z.date());
+
 const securitySchema = z.object({
   ticker: z.string().trim().toUpperCase().min(1),
   cik: z
@@ -59,7 +62,7 @@ const eventSchema = z.object({
   securityId: z.string().uuid().nullable().optional(),
   sourceKey: z.string().min(1),
   payload: z.record(z.unknown()),
-  occurredAt: z.coerce.date(),
+  occurredAt: dateInput,
 });
 
 /** recordEvent: store a new filing, macro release or price move once. */
@@ -104,7 +107,7 @@ const documentSchema = z.object({
   sourceUrl: z.string().url(),
   docType: z.string().min(1),
   accession: z.string().nullable().optional(),
-  publishedAt: z.coerce.date().nullable().optional(),
+  publishedAt: dateInput.nullable().optional(),
   text: z.string().min(1),
 });
 

@@ -1,0 +1,39 @@
+{
+ "_note": "SYNTHETIC test fixture in the documented response shape. Not recorded from the live API; values are made up.",
+ "realtime_start": "2025-09-01",
+ "realtime_end": "2025-09-01",
+ "units": "lin",
+ "count": 5,
+ "observations": [
+  {
+   "realtime_start": "2025-09-01",
+   "realtime_end": "2025-09-01",
+   "date": "2024-07-01",
+   "value": "310.0"
+  },
+  {
+   "realtime_start": "2025-09-01",
+   "realtime_end": "2025-09-01",
+   "date": "2024-08-01",
+   "value": "311.0"
+  },
+  {
+   "realtime_start": "2025-09-01",
+   "realtime_end": "2025-09-01",
+   "date": "2025-06-01",
+   "value": "."
+  },
+  {
+   "realtime_start": "2025-09-01",
+   "realtime_end": "2025-09-01",
+   "date": "2025-07-01",
+   "value": "319.3"
+  },
+  {
+   "realtime_start": "2025-09-01",
+   "realtime_end": "2025-09-01",
+   "date": "2025-08-01",
+   "value": "320.11"
+  }
+ ]
+}
