@@ -276,7 +276,7 @@ export async function reviseThesis(db: Db, actor: Actor, input: ReviseThesisInpu
     const before = await buildSnapshot(tx, thesis.id);
     const today = todayUtc(opts.now);
     const touchedIds = [...data.assumptionChanges.map((c) => c.assumptionId), ...data.retireAssumptionIds];
-    const existing = touchedIds.length
+    const existing: (typeof assumptions.$inferSelect)[] = touchedIds.length
       ? await tx
           .select()
           .from(assumptions)

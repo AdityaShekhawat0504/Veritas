@@ -1,5 +1,5 @@
-// Saved demo memo so the live decompose demo never depends on the LLM improvising.
-// NVDA / data-center capex / export-control — the canonical demo case.
+// Example memo for trying the intake screen. The author and the views are
+// fictional; it is not investment research.
 
 export const DEMO_MEMO = `Author: J. Reyes, Senior Analyst
 Name: NVIDIA (NVDA)
