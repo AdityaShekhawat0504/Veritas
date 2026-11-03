@@ -1,137 +1,110 @@
 # Veritas
 
-Live: https://veritas-rose-beta.vercel.app
+A system of record for investment reasoning, for discretionary and fundamental investment teams.
 
-Turn an investment memo into a structured, monitorable **thesis**.
+[![CI](https://github.com/AdityaShekhawat0504/veritas/actions/workflows/ci.yml/badge.svg?branch=v2)](https://github.com/AdityaShekhawat0504/veritas/actions/workflows/ci.yml)
 
-Veritas IC reads a memo written in plain language and decomposes it into the core
-claim, the assumptions it rests on (ranked by how load-bearing they are), and the
-evidence behind each. It then checks every assumption against current reality and
-shows a **thesis-integrity score** that drops when assumptions break — plus a
-banner when a stated conviction is out of line with how intact the thesis
-actually is.
+## Why it matters
 
-Multi-user: each analyst signs in with Google and sees only their own theses.
-
-## Stack
-
-Next.js 15 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Prisma ·
-Neon Postgres · Auth.js v5 (NextAuth, Google OAuth) · OpenAI API · Vercel
+Investment memos state a view, but the assumptions behind it are rarely written down in a form that can be checked later. When a thesis breaks, teams find out from the price, not from the data that broke it, and nobody can say afterwards how good the original forecasts were. Veritas turns each thesis into assumptions with a probability and a resolution date, checks them against filings and macro data, and keeps a permanent log of every change and decision.
 
 ## How it works
 
-**1. New Thesis (`/thesis/new`)** — paste a memo, hit *Decompose*. `gpt-5.4`
-returns a strict-JSON-schema structured thesis: claim, direction, horizon,
-conviction, the decision, and the minimum set of load-bearing assumptions, each
-tagged `critical` or `supporting` with its supporting evidence. You review and
-edit the extraction before it is saved — the human-in-the-loop confirmation is
-deliberate.
+1. **Intake.** An analyst pastes a memo or uploads a PDF/DOCX. The LLM gateway drafts the claim, falsifiable assumptions, resolution dates, indicators and kill criteria. Indicators can only come from a closed catalog; anything else is dropped.
+2. **Review.** The analyst edits every assumption. Critical assumptions cannot be saved without the analyst's own probability and a resolve-by date. Saving freezes version 1 of the thesis.
+3. **Numeric checks.** Background jobs pull SEC EDGAR XBRL facts, FRED series and end-of-day prices. Code computes the value (y/y growth, margins, drawdowns) and compares it to the indicator threshold. No model is involved in a numeric verdict.
+4. **Alerts.** A check is always stored; an alert is raised only when the verdict changes. Kill criteria fire once when their indicator condition is met.
+5. **Ledger.** Every write goes through a named action that validates its rules and appends to `action_log` in the same transaction. `action_log`, `checks`, `thesis_versions` and `evidence` are insert-only, enforced by database triggers.
 
-**2. Thesis Detail (`/thesis/[id]`)** — assumptions with status chips
-(green = holding, amber = weakening, red = contradicted) and their
-critical/supporting tag, a **Check thesis now** button, the integrity score with
-a history sparkline, and the conviction-vs-integrity mismatch banner.
-
-*Check* runs `gpt-5.4-mini` once per assumption, in parallel, and returns
-`{ status, reason, source }`. A source is never fabricated — if the claim can't
-be verified, the model says so. Individual failures are tolerated: a single
-model hiccup leaves that assumption's prior status untouched instead of sinking
-the whole re-check. Checks run on demand, never on a schedule.
-
-**3. Dashboard (`/`)** — your theses as cards sorted by integrity ascending, so
-breaks float to the top, with a red flag on any thesis that has a contradicted
-critical assumption. A new account starts empty with a one-click **Load samples**
-button that clones three demo theses into that account.
-
-### Integrity score
-
-A pure function in `lib/score.ts` (unit-tested, no I/O):
-
-```
-holding = 1.0   weakening = 0.5   contradicted = 0.0
-critical × 2    supporting × 1
-
-score = round( 100 × Σ(statusValue × weight) / Σ(weight) )
+```mermaid
+flowchart LR
+  memo[Memo: text, PDF, DOCX] --> llm[lib/llm gateway<br/>versioned prompt, logged calls]
+  llm --> draft[Draft thesis]
+  draft --> review[Analyst review<br/>probability + resolve-by]
+  review --> actions[lib/actions<br/>rules + action_log in one transaction]
+  edgar[SEC EDGAR] --> jobs[Inngest jobs]
+  fred[FRED] --> jobs
+  prices[Tiingo prices] --> jobs
+  jobs --> values[lib/data/values<br/>numbers computed in code]
+  values --> actions
+  actions --> db[(Postgres<br/>insert-only ledger tables)]
+  db --> ui[Thesis page:<br/>verdicts, evidence, versions, log]
 ```
 
-A contradicted critical assumption visibly tanks the score. Every computed score
-is persisted as a `Check` row, which is what the sparkline draws.
+Verdicts are `supported`, `weakened`, `contradicted` or `insufficient_evidence`. A numeric indicator has a threshold and an optional break threshold: meeting the threshold is supported, missing it but staying past the break threshold is weakened, anything else is contradicted, and missing data is insufficient evidence. Text checks (planned) must quote the stored source word for word; the verbatim-quote rule is already enforced in `runCheck`, so an unverified quote is recorded as `insufficient_evidence`.
 
-## Project layout
+More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-```
-/app
-  /                       Dashboard
-  /signin                 Google sign-in
-  /thesis/new             Memo editor + decompose
-  /thesis/[id]            Thesis detail, check, score
-  /api/decompose          POST memo   -> structured thesis (LLM)
-  /api/check              POST thesisId -> re-check assumptions (LLM)
-  /api/theses             POST a confirmed thesis
-  /api/samples            POST -> clone demo theses into your account
-  /api/auth/*             Auth.js routes
-/components               Presentational React components
-/lib
-  openai.ts               OpenAI client singleton
-  prompts.ts              Every prompt + JSON schema lives here
-  decompose.ts            memo -> DecomposedThesis
-  check.ts                assumption -> { status, reason, source }
-  score.ts                Integrity score (pure)
-  db.ts                   Data access layer — the only place Prisma is touched
-  auth.ts / auth.config.ts  Auth.js config (edge-safe config split out)
-  sampleTheses.ts         The clonable demo set (pure data)
-  types.ts                Shared domain types
-/prisma/schema.prisma     Data model + Auth.js adapter models
-middleware.ts             Gates every route behind login
-```
+## Results
 
-Boundaries worth keeping: the UI never calls the LLM or the database directly —
-always through `/api` and `/lib`. Prompts live only in `prompts.ts`. Every
-function in `db.ts` takes a `userId` and enforces ownership there, not in the UI.
+There are no evaluation numbers yet. The gold set in `eval/gold/gold.jsonl` is empty, so `pnpm eval` prints `n/a` for precision, false-alert rate and abstention rate. `pnpm eval --examples` runs on three illustrative entries and prints them under an "EXAMPLE DATA" banner; those numbers are not results.
 
-## Setup
+Not yet measured: precision of `contradicted` on real filings, false-alert rate on clean controls, and cost per check. They will be reported here once the gold set holds real historical assumptions.
+
+## Quickstart
+
+Requires Node 22 and pnpm 10.
 
 ```bash
-npm install
-cp .env.example .env.local      # fill in the values below
-npx prisma migrate dev          # create the schema
-npm run dev                     # http://localhost:3000
+pnpm install
+pnpm test        # unit and database tests on in-memory Postgres (PGlite), no secrets needed
+pnpm eval        # gold-set evaluation (empty set prints n/a)
 ```
 
-Environment variables (all server-side only — never `NEXT_PUBLIC_`):
+To run the app you need a Postgres database with pgvector and Google OAuth credentials:
 
-| Variable | What it is |
-| --- | --- |
-| `OPENAI_API_KEY` | OpenAI key for decompose + check |
-| `DATABASE_URL` | Neon **pooled** connection (`…-pooler.…`), used at runtime |
-| `DIRECT_URL` | Neon **direct** connection, used by `prisma migrate` |
-| `AUTH_SECRET` | `npx auth secret` |
-| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google Cloud Console → Credentials → OAuth client |
+```bash
+cp .env.example .env.local     # fill in DATABASE_URL, AUTH_* and the data source keys
+pnpm db:migrate                # apply db/migrations
+pnpm db:seed-catalog           # load the indicator catalog
+pnpm dev                       # http://localhost:3000
+```
 
-The database URLs belong in both `.env.local` (Next runtime) and `.env` (read by
-the Prisma CLI). Google OAuth needs the redirect URI
-`http://localhost:3000/api/auth/callback/google` in dev, and
-`https://YOUR-DOMAIN/api/auth/callback/google` in production.
+Set `LLM_PROVIDER=mock` to click through intake without an OpenAI key. Everything needed for a live deployment is listed in [docs/GO_LIVE.md](docs/GO_LIVE.md).
 
-Optional: `npx prisma db seed` creates a local `demo@veritas.local` user with
-the sample theses, for local development. Real users are
-never auto-seeded — they opt in via *Load samples*.
+## Tech stack
 
-## Scripts
+Next.js 15 (App Router, TypeScript), Tailwind CSS 4, Drizzle ORM, Postgres (Neon, EU region) with pgvector, Auth.js v5 (Google), Inngest for background jobs, OpenAI structured outputs behind a provider-neutral gateway, Vitest with PGlite for tests, Vercel.
 
-| Command | |
-| --- | --- |
-| `npm run dev` | Dev server |
-| `npm run build` | `prisma generate && prisma migrate deploy && next build` |
-| `npm test` | Vitest — the `score.ts` unit tests |
-| `npm run db:migrate` | `prisma migrate dev` |
-| `npm run db:reset` | Drop, re-migrate, re-seed |
-| `npm run seed` | Seed the demo user |
+Data: SEC EDGAR (free), FRED (free API key), Tiingo end-of-day prices (paid plan for commercial use). US-listed companies only for now.
 
-## Deploy
+## Project structure
 
-Deployed on Vercel. Set the env vars above as Vercel environment variables, plus
-`AUTH_URL` set to your production domain,
-add the production callback URL to the Google OAuth client, and push — the build
-command runs `prisma migrate deploy` before `next build`, so migrations apply on
-deploy. Schema changes go through `prisma migrate`, never `db push`.
+```
+app/                  Pages (dashboard, intake, review, thesis) and API routes
+components/           UI components
+db/                   Drizzle schema, enums, SQL migrations, migration runner
+lib/actions/          The only write path: one function per action, rules in rules.ts
+lib/llm/              LLM gateway, providers (OpenAI, mock), versioned prompts
+lib/data/             EDGAR, FRED and Tiingo adapters, rate limiter, catalog, value maths
+lib/jobs/             Ingestion and numeric-check jobs (plain functions)
+lib/inngest/          Inngest client and function wiring
+lib/intake/           Memo text extraction, draft creation, review-screen logic
+eval/                 Gold-set format, metrics and the pnpm eval runner
+seed/                 Demo thesis format with three EXAMPLE entries
+tests/                Vitest suites and fixtures
+docs/                 Architecture and go-live checklist
+```
+
+## Status by phase
+
+| Phase | Scope | Status |
+|---|---|---|
+| 0 | Schema, action layer with rules and action_log, insert-only tables, eval skeleton | Built, tests written |
+| 1 | Memo intake, LLM extraction, review screen | Built, tests written |
+| 2 | EDGAR, FRED and Tiingo adapters, indicator catalog, numeric checks, Inngest jobs | Built, tests written; not yet run against live APIs |
+| 3 | Cited text checks over filing text (pgvector), eval metrics for text checks | Not started |
+| 4 | PM board, integrity score, email alerts | Not started |
+| 5 | Audit export, revise UI, firm roles and invites, Microsoft Entra sign-in | Not started (roles exist in the schema) |
+| 6 | Demo seed and calibration view | Format only (`seed/`) |
+
+v1 (the earlier memo-scoring app) is live from `main`. v2 lives on the `v2` branch and is not deployed yet.
+
+## Limitations and next steps
+
+- The test suite and the build have not been run in a full environment yet; CI on this branch is their first full run.
+- Adapter tests use synthetic fixtures in the documented response shapes, not recorded live responses. The first live check is a manual step in docs/GO_LIVE.md.
+- Quarterly XBRL indicators use three-month facts. Many companies do not report a three-month Q4, so after a 10-K the latest quarterly value is still Q3.
+- Price returns use Tiingo adjusted closes from the position's entry date, so they include dividends.
+- Rate limits are per process. Inngest functions run with concurrency 1 to keep the total under the EDGAR and FRED limits.
+- Next: build the gold set, then Phase 3 (cited text checks with double-run agreement and the full eval report).

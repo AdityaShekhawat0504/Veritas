@@ -73,3 +73,21 @@ describe("scoring", () => {
     expect(m.accuracy).toBe(0.4);
   });
 });
+
+describe("demo thesis format", () => {
+  it("the three example demo theses parse, are labelled, and use catalog keys", async () => {
+    const { parseDemoTheses } = await import("@/seed/demoTheses");
+    const { INDICATOR_CATALOG } = await import("@/lib/data/catalog");
+    const raw = JSON.parse(
+      readFileSync(fileURLToPath(new URL("../seed/demo-theses.example.json", import.meta.url)), "utf8"),
+    ) as unknown;
+    const list = parseDemoTheses(raw);
+    expect(list).toHaveLength(3);
+    expect(list.every((t) => t.example && t.thesis.claim.startsWith("EXAMPLE:"))).toBe(true);
+    const keys = new Set(INDICATOR_CATALOG.map((c) => c.key));
+    for (const t of list) {
+      for (const a of t.assumptions) for (const i of a.indicators) expect(keys.has(i.catalogKey), i.catalogKey).toBe(true);
+      for (const k of t.killCriteria) for (const i of k.indicators) expect(keys.has(i.catalogKey), i.catalogKey).toBe(true);
+    }
+  });
+});

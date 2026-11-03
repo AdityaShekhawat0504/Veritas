@@ -276,7 +276,11 @@ describe("runCheck (numeric)", () => {
     expect(broken.verdict).toBe("contradicted");
     expect(broken.alertId).not.toBeNull();
     const assumptionId = (await w.db.select().from(checks).where(eq(checks.id, broken.checkId)))[0].assumptionId;
-    const rows = await w.db.select().from(alerts).where(eq(alerts.assumptionId, assumptionId));
+    const rows = await w.db
+      .select()
+      .from(alerts)
+      .where(eq(alerts.assumptionId, assumptionId))
+      .orderBy(asc(alerts.createdAt));
     expect(rows.map((a) => a.newVerdict)).toEqual(["weakened", "contradicted"]);
   });
 

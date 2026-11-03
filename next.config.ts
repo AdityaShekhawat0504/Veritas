@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // PGlite is only used in tests and local scripts; keep it and the Postgres
-  // driver out of the client and server bundles' transpile step.
-  serverExternalPackages: ["@electric-sql/pglite", "postgres"],
+  // Load these from node_modules at runtime instead of bundling them.
+  // PGlite is only used by tests; mammoth and unpdf parse uploaded memos.
+  serverExternalPackages: ["@electric-sql/pglite", "postgres", "mammoth", "unpdf"],
   // No ESLint setup in this repo yet; type checking still runs during build.
   eslint: { ignoreDuringBuilds: true },
 };
