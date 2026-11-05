@@ -2,6 +2,8 @@
 .env
 .env.local
 .env*.local
+.env*
+!.env.example
 
 # dependencies
 node_modules/
@@ -10,17 +12,12 @@ node_modules/
 .next/
 out/
 next-env.d.ts
+*.tsbuildinfo
 
-# prisma / sqlite
-/prisma/*.db
-/prisma/*.db-journal
-
-# local-only spec
-CLAUDE.md
+# eval output
+eval/results/
 
 # misc
 .DS_Store
 *.log
 .vercel
-.env*
-!.env.example

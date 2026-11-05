@@ -1,0 +1,154 @@
+[
+  {
+    "id": "EXAMPLE-DEMO-1",
+    "example": true,
+    "writtenOn": "2026-11-03",
+    "thesis": {
+      "ticker": "EXA",
+      "cik": null,
+      "securityName": "Example Alpha Inc. (fictional)",
+      "claim": "EXAMPLE: Alpha's subscription revenue keeps compounding above 10% a year",
+      "direction": "long",
+      "horizonMonths": 12,
+      "convictionPct": 65,
+      "position": {
+        "sizePct": 2,
+        "entryDate": "2026-11-03",
+        "entryPrice": null
+      }
+    },
+    "assumptions": [
+      {
+        "text": "EXAMPLE: revenue growth stays in double digits",
+        "falsifiableText": "EXAMPLE: quarterly revenue grows at least 10% year on year in every quarter to 2027-09-30",
+        "critical": true,
+        "category": "revenue",
+        "probability": 0.6,
+        "resolveBy": "2027-11-15",
+        "indicators": [
+          {
+            "catalogKey": "revenue_yoy_pct_q",
+            "operator": "gte",
+            "threshold": 10,
+            "breakThreshold": 5
+          }
+        ]
+      },
+      {
+        "text": "EXAMPLE: gross margin holds",
+        "falsifiableText": "EXAMPLE: quarterly gross margin stays at or above 70%",
+        "critical": false,
+        "category": "margin",
+        "probability": null,
+        "resolveBy": null,
+        "indicators": [
+          {
+            "catalogKey": "gross_margin_pct_q",
+            "operator": "gte",
+            "threshold": 70,
+            "breakThreshold": null
+          }
+        ]
+      }
+    ],
+    "killCriteria": [
+      {
+        "condition": "EXAMPLE: exit if the position falls 25% from its high",
+        "indicators": [
+          {
+            "catalogKey": "drawdown_from_high_pct",
+            "operator": "lt",
+            "threshold": -25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "EXAMPLE-DEMO-2",
+    "example": true,
+    "writtenOn": "2026-11-03",
+    "thesis": {
+      "ticker": "EXB",
+      "cik": null,
+      "securityName": "Example Beta Corp. (fictional)",
+      "claim": "EXAMPLE: Beta benefits from falling policy rates",
+      "direction": "long",
+      "horizonMonths": 12,
+      "convictionPct": 55,
+      "position": {
+        "sizePct": 2,
+        "entryDate": "2026-11-03",
+        "entryPrice": null
+      }
+    },
+    "assumptions": [
+      {
+        "text": "EXAMPLE: the Fed cuts rates",
+        "falsifiableText": "EXAMPLE: the effective fed funds rate is below 3% by 2027-06-30",
+        "critical": true,
+        "category": "macro",
+        "probability": 0.45,
+        "resolveBy": "2027-06-30",
+        "indicators": [
+          {
+            "catalogKey": "fed_funds_rate",
+            "operator": "lt",
+            "threshold": 3,
+            "breakThreshold": 3.5
+          }
+        ]
+      }
+    ],
+    "killCriteria": []
+  },
+  {
+    "id": "EXAMPLE-DEMO-3",
+    "example": true,
+    "writtenOn": "2026-11-03",
+    "thesis": {
+      "ticker": "EXC",
+      "cik": null,
+      "securityName": "Example Gamma Ltd. (fictional)",
+      "claim": "EXAMPLE: Gamma's margin recovery continues",
+      "direction": "long",
+      "horizonMonths": 12,
+      "convictionPct": 70,
+      "position": {
+        "sizePct": 2,
+        "entryDate": "2026-11-03",
+        "entryPrice": null
+      }
+    },
+    "assumptions": [
+      {
+        "text": "EXAMPLE: operating margin recovers",
+        "falsifiableText": "EXAMPLE: quarterly operating margin is at least 15% by 2027-03-31",
+        "critical": true,
+        "category": "margin",
+        "probability": 0.55,
+        "resolveBy": "2027-05-15",
+        "indicators": [
+          {
+            "catalogKey": "operating_margin_pct_q",
+            "operator": "gte",
+            "threshold": 15,
+            "breakThreshold": 10
+          }
+        ]
+      }
+    ],
+    "killCriteria": [
+      {
+        "condition": "EXAMPLE: exit if inventory grows more than 30% y/y",
+        "indicators": [
+          {
+            "catalogKey": "inventory_yoy_pct",
+            "operator": "gt",
+            "threshold": 30
+          }
+        ]
+      }
+    ]
+  }
+]

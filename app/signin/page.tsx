@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/lib/auth";
 
-export const metadata = { title: "Sign in · Veritas IC" };
+export const metadata = { title: "Sign in · Veritas" };
 
 export default async function SignInPage() {
   // Already signed in? Skip the gate.
@@ -19,7 +19,7 @@ export default async function SignInPage() {
             </svg>
           </span>
           <span className="text-base font-semibold tracking-tight text-ink">
-            Veritas <span className="text-ink-faint">IC</span>
+            Veritas
           </span>
         </div>
 
@@ -27,8 +27,8 @@ export default async function SignInPage() {
           Sign in
         </h1>
         <p className="mt-1.5 text-sm text-ink-muted">
-          Turn an investment memo into a structured, monitorable thesis. Sign in
-          to see and check your own theses.
+          A system of record for investment reasoning. Sign in to see your
+          firm&apos;s theses, their assumptions and every check against real data.
         </p>
 
         <form

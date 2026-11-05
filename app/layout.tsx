@@ -5,8 +5,8 @@ import { UserMenu } from "@/components/UserMenu";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Veritas IC",
-  description: "Turn an investment memo into a structured, monitorable thesis.",
+  title: "Veritas",
+  description: "A system of record for investment reasoning.",
 };
 
 export default async function RootLayout({
@@ -30,7 +30,7 @@ export default async function RootLayout({
                 </svg>
               </span>
               <span className="text-sm font-semibold tracking-tight text-ink">
-                Veritas <span className="text-ink-faint">IC</span>
+                Veritas
               </span>
             </Link>
             {signedIn && (

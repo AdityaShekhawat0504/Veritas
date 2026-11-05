@@ -1,0 +1,32 @@
+{
+ "_note": "SYNTHETIC test fixture in the documented response shape. Not recorded from the live API; values are made up.",
+ "cik": 1,
+ "taxonomy": "us-gaap",
+ "tag": "GrossProfit",
+ "label": "Gross profit",
+ "entityName": "EXAMPLE CORP (fixture)",
+ "units": {
+  "USD": [
+   {
+    "end": "2024-06-30",
+    "val": 450,
+    "accn": "0000000001-24-000020",
+    "form": "10-Q",
+    "filed": "2024-08-02",
+    "fy": 2024,
+    "fp": "Q2",
+    "start": "2024-04-01"
+   },
+   {
+    "end": "2025-06-30",
+    "val": 391,
+    "accn": "0000000001-25-000012",
+    "form": "10-Q",
+    "filed": "2025-08-01",
+    "fy": 2025,
+    "fp": "Q2",
+    "start": "2025-04-01"
+   }
+  ]
+ }
+}
